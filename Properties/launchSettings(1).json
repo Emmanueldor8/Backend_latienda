@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "LaTiendaAPI": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50627;http://localhost:50628"
+    }
+  }
+}
