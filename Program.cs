@@ -8,29 +8,25 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers
+#region Servicios
+
 builder.Services.AddControllers()
-    .AddJsonOptions(opt =>
+    .AddJsonOptions(options =>
     {
-        opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-// OpenAPI
 builder.Services.AddOpenApi();
 
-// AutoMapper
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// Base de datos SQL Server (Somee)
 builder.Services.AddDbContext<LatiendaContext>(options =>
 {
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("cadenaSQL"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure()
-    );
+        sqlOptions => sqlOptions.EnableRetryOnFailure());
 });
 
-// JWT
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddAuthentication("Bearer")
@@ -40,8 +36,8 @@ builder.Services.AddAuthentication("Bearer")
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
             ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
 
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
@@ -53,7 +49,6 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVercelAndLocal", policy =>
@@ -64,9 +59,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+#endregion
+
 var app = builder.Build();
 
-// Crear la base de datos si no existe
+#region Seed inicial
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -74,8 +72,6 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<LatiendaContext>();
-
-        context.Database.EnsureCreated();
 
         if (!context.Roles.Any())
         {
@@ -87,12 +83,11 @@ using (var scope = app.Services.CreateScope())
 
         if (!context.Categorias.Any())
         {
-            context.Categorias.Add(
-                new Categoria
-                {
-                    Nombre = "General",
-                    Estado = true
-                });
+            context.Categorias.Add(new Categoria
+            {
+                Nombre = "General",
+                Estado = true
+            });
         }
 
         context.SaveChanges();
@@ -104,14 +99,17 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Swagger
+#endregion
+
+#region Middleware
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "LaTiendaApi v1");
+        options.SwaggerEndpoint("/openapi/v1.json", "LaTienda API");
     });
 }
 
@@ -124,5 +122,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+#endregion
 
 app.Run();
