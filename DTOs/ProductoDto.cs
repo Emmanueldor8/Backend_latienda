@@ -9,6 +9,7 @@ namespace LaTiendaApi.DTOs
         public decimal? Precio { get; set; }
         public int? Stock { get; set; }
         public bool? Estado { get; set; }
+        public int IdCategoria { get; set; }
         public string CategoriaNombre { get; set; } = string.Empty;
     }
 
@@ -36,5 +37,3 @@ namespace LaTiendaApi.DTOs
         public string Nombre { get; set; } = string.Empty;
     }
 }
-
-
