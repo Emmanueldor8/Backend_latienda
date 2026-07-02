@@ -97,7 +97,7 @@ POST /api/auth/Registrar
   "tipoDoc": "CC",
   "nroDoc": "44444",
   "nombre": "Magno",
-  "email": "magno@gmail.com",
+  "email": "Hola.com",
   "password": "44444",
   "roles": [1]
 }
@@ -107,7 +107,7 @@ POST /api/auth/Registrar
 ```json
 POST /api/auth/login
 {
-  "email": "magno@gmail.com",
+  "email": "Hola",
   "password": "44444"
 }
 ```
@@ -117,7 +117,7 @@ POST /api/auth/login
 POST /api/producto/Guardar
 {
   "idCategoria": 2,
-  "nombre": "Leche deslactosada",
+  "nombre": "Camisa",
   "precio": 4200,
   "stock": 15,
   "estado": true
